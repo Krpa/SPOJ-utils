@@ -69,6 +69,27 @@ class Del(TodoInstruction):
                 finalList.append(prob)
         self.writeTodo(finalList)
 
+class List(TodoInstruction):
+
+    def __init__(self, location):
+        super(List, self).__init__(location)
+
+    def doInstruction(self, args):
+        todo = self.readTodo()
+        print "TODO List:"
+        print "================"
+        for prob in todo:
+            print prob
+        print "================"
+
+class Clear(TodoInstruction):
+
+    def __init__(self, location):
+        super(Clear, self).__init__(location)
+
+    def doInstruction(self, args):
+        self.writeTodo([])
+
 #init function, reads init file, initializes instructions
 def init_function():
     todo_location = "TODO_LOCATION"
@@ -88,7 +109,8 @@ def init_function():
     instructions = {}
     instructions["add"] = Add(init_params[todo_location])
     instructions["del"] = Del(init_params[todo_location])
-
+    instructions["ls"] = List(init_params[todo_location])
+    instructions["clear"] = Clear(init_params[todo_location])
 
 if __name__ == "__main__":
     instructions = {}

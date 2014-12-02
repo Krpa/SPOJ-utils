@@ -11,7 +11,15 @@ class TodoInstruction(object):
     #execute instruction
     def doInstruction(self, args):
         print ("Doing instruction! Parameters:")
-        print (args)
+        print (self.prepareArguments(self, args))
+
+    def prepareArguments(self, args):
+        arguments = args.split(",")
+        problems = []
+        for arg in arguments:
+            if arg.strip() != "":
+                problems.append(arg.strip())
+        return problems
 
     #read todo list
     def readTodo(self):
@@ -41,9 +49,24 @@ class Add(TodoInstruction):
         super(Add, self).__init__(location)
 
     def doInstruction(self, args):
-        problems = args.split(",")
+        problems = self.prepareArguments(args)
         todo = self.readTodo()
         finalList = sorted(list(set(problems + todo)))
+        self.writeTodo(finalList)
+
+#Delete problems from TODO list
+class Del(TodoInstruction):
+
+    def __init__(self, location):
+        super(Del, self).__init__(location)
+
+    def doInstruction(self, args):
+        problems = self.prepareArguments(args)
+        todo = self.readTodo()
+        finalList = []
+        for prob in todo:
+            if not prob in problems:
+                finalList.append(prob)
         self.writeTodo(finalList)
 
 #init function, reads init file, initializes instructions
@@ -64,6 +87,7 @@ def init_function():
     global instructions
     instructions = {}
     instructions["add"] = Add(init_params[todo_location])
+    instructions["del"] = Del(init_params[todo_location])
 
 
 if __name__ == "__main__":
@@ -83,6 +107,8 @@ if __name__ == "__main__":
         if not command[0] in instructions:
             print("Unknown instruction.")
             continue
+        if len(command) == 1:
+            command.append("")
         try:
             instructions[command[0]].doInstruction(command[1])
         except:

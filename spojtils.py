@@ -38,7 +38,8 @@ class TodoInstruction(object):
     def writeTodo(self, lst):
         f = open(self.location, "w")
         for prob in lst:
-            f.write(prob+"\n")
+            if prob.strip() != "":
+                f.write(prob.strip()+"\n")
         f.close()
 
 
@@ -69,6 +70,7 @@ class Del(TodoInstruction):
                 finalList.append(prob)
         self.writeTodo(finalList)
 
+#Prints todo list to console
 class List(TodoInstruction):
 
     def __init__(self, location):
@@ -82,6 +84,7 @@ class List(TodoInstruction):
             print prob
         print "================"
 
+#Clears todo list
 class Clear(TodoInstruction):
 
     def __init__(self, location):
@@ -89,6 +92,29 @@ class Clear(TodoInstruction):
 
     def doInstruction(self, args):
         self.writeTodo([])
+
+#Generates Html document for todo list
+class getHtml(TodoInstruction):
+
+    def __init__(self, location):
+        super(getHtml, self).__init__(location)
+
+    def doInstruction(self, args):
+        arguments = self.prepareArguments(args)
+        if len(arguments) == 0:
+            print "No argument given."
+            return
+        path = arguments[0]
+        todo = self.readTodo()
+        f = open(path, "w")
+        f.write("<html>\n")
+        f.write("<head><h2> TODO List: </h2></head>\n")
+        f.write("<body>\n")
+        for prob in todo:
+            f.write("<a href=\"http://www.spoj.com/problems/" + prob + "/\">" + prob + "</a><br>")
+        f.write("</body>\n")
+        f.write("</html>\n")
+        f.close()
 
 #init function, reads init file, initializes instructions
 def init_function():
@@ -111,6 +137,7 @@ def init_function():
     instructions["del"] = Del(init_params[todo_location])
     instructions["ls"] = List(init_params[todo_location])
     instructions["clear"] = Clear(init_params[todo_location])
+    instructions["getHtml"] = getHtml(init_params[todo_location])
 
 if __name__ == "__main__":
     instructions = {}
